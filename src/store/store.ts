@@ -1,11 +1,9 @@
-import { Jumbo, Query } from '../jumbo';
+import { Headers, Query } from '../jumbo';
+import { JumboObject } from '../base/jumboObject';
 import { StoreModel } from './storeModel';
 import { StoreQueryModel } from './storeQueryModel';
-import { Headers } from 'node-fetch';
 
-export class Store {
-    constructor(private readonly jumbo: Jumbo) {}
-
+export class Store extends JumboObject {
     /**
      * Gets store from store ID
      * @param storeId Store ID

@@ -1,29 +1,109 @@
-const fetch = require('node-fetch');
-import { Headers, RequestInit } from 'node-fetch';
+import axios, { AxiosInstance } from 'axios';
 import { Product } from './product/product';
 import { Store } from './store/store';
+import { TokenHandler } from './auth/tokenHandler';
+import https from 'https';
+import { Order } from './order/order';
+import { Promotion } from './promotion/promotion';
+import { Recipe } from './recipe/recipe';
+import { User } from './user/user';
 require('dotenv').config();
 const endpoint = process.env.ENDPOINT;
 
 export class Jumbo {
+    private readonly client: AxiosInstance;
+
+    jumboOrder: Order;
     jumboProduct: Product;
+    jumboPromotion: Promotion;
+    jumboRecipe: Recipe;
     jumboStore: Store;
+    jumboUser: User;
+    tokenHandler?: TokenHandler;
 
     constructor(
         private readonly username?: string,
         private readonly password?: string,
         private readonly verbose?: boolean
     ) {
-        this.jumboProduct = new Product(this);
-        this.jumboStore = new Store(this);
+        // Create https agent for TLSv1.2 or less (API doesn't respond to TLSv1.3+)
+        this.client = axios.create({
+            httpsAgent: new https.Agent({
+                maxVersion: 'TLSv1.2',
+            }),
+        });
+        // Set separate classes
+        this.jumboOrder = new Order(this, true);
+        this.jumboProduct = new Product(this, false);
+        this.jumboPromotion = new Promotion(this, false);
+        this.jumboRecipe = new Recipe(this, false);
+        this.jumboStore = new Store(this, false);
+        this.jumboUser = new User(this, true);
+        // Login using given username and password
+        if (username && password) {
+            this.login(username, password);
+        }
+    }
+
+    order() {
+        return this.jumboOrder;
     }
 
     product() {
         return this.jumboProduct;
     }
 
+    promotion() {
+        return this.jumboPromotion;
+    }
+
+    recipe() {
+        return this.jumboRecipe;
+    }
+
     store() {
         return this.jumboStore;
+    }
+
+    user() {
+        return this.jumboUser;
+    }
+
+    /**
+     * Function that creates a new TokenHandler for given username and password
+     * @param username Jumbo account username (e-mail)
+     * @param password Jumbo account password
+     */
+    login(username: string, password: string) {
+        this.tokenHandler = new TokenHandler(this, username, password);
+    }
+
+    /**
+     * POST request
+     * @param path Endpoint URL (without start)
+     * @param body Body of POST
+     * @param extraHeaders Any extra headers
+     * @param query Any query options
+     * @param authRequired Whether a token is required for the function
+     * @param fullResponse Returns response + headers instead of only data
+     */
+    async post(
+        path: string,
+        body: any,
+        extraHeaders?: Headers,
+        query?: Query,
+        authRequired?: boolean,
+        fullResponse?: boolean
+    ) {
+        return this.request(
+            path,
+            requestMethod.POST,
+            body,
+            extraHeaders,
+            query,
+            authRequired,
+            fullResponse
+        );
     }
 
     /**
@@ -31,14 +111,24 @@ export class Jumbo {
      * @param path Endpoint URL (without start)
      * @param extraHeaders Any extra headers
      * @param query Any query options
+     * @param authRequired Whether a token is required for the function
+     * @param fullResponse Returns response + headers instead of only data
      */
-    async get(path: string, extraHeaders?: Headers, query?: Query) {
+    async get(
+        path: string,
+        extraHeaders?: Headers,
+        query?: Query,
+        authRequired?: boolean,
+        fullResponse?: boolean
+    ) {
         return this.request(
             path,
             requestMethod.GET,
             undefined,
             extraHeaders,
-            query
+            query,
+            authRequired,
+            fullResponse
         );
     }
 
@@ -49,61 +139,87 @@ export class Jumbo {
      * @param body Body in case of POST and PUT
      * @param extraHeaders Any extra headers (Content-Type and Accept) are already included
      * @param query Query in case of GET
+     * @param authRequired Whether a token is required for the function
+     * @param fullResponse Returns response + headers instead of only data
      */
     async request(
         path: string,
         method: requestMethod,
         body?: any,
         extraHeaders?: Headers,
-        query?: Query
+        query?: Query,
+        authRequired?: boolean,
+        fullResponse?: boolean
     ) {
+        // If auth is required and we don't have a token yet, we should create one
+        if (authRequired) {
+            if (!this.tokenHandler) {
+                throw new Error(
+                    `You must be logged in to access this path: ${
+                        endpoint + path
+                    }`
+                );
+            } else {
+                // If the tokenHandler doesn't have a token yet, make sure it gets one
+                await this.tokenHandler.Ready;
+            }
+        }
+
         // Create initial header properties
-        let requestHeaders: Headers = this.createHeader(extraHeaders);
+        let requestHeaders: Headers = this.createHeader(
+            authRequired,
+            extraHeaders
+        );
 
         // Add query to URL if given
         let url: string = this.createURL(path, query);
 
-        // Create request options with method, headers and body
-        let requestOptions: RequestInit = {
-            method: method,
-            headers: requestHeaders,
-            body: body,
-        };
-
         // Log if verbose
         if (this.verbose) {
             console.log(url);
-            console.log(requestOptions);
+            console.log(method);
+            console.log(requestHeaders);
+            void (body && console.log(body));
         }
 
         // Make request
-        let response = await fetch(url, requestOptions);
+        let response = await this.client.request({
+            method: method,
+            url: url,
+            headers: requestHeaders,
+            data: body,
+        });
 
         // Throw error if response not ok
-        if (!response.ok) {
-            throw new Error(response.statusText);
+        if (!response.statusText) {
+            const text = response.data;
+
+            throw new Error(`${response.statusText}: ${text}`);
         }
 
+        if (fullResponse) {
+            return response;
+        }
         // Return response in JSON format
-        return await response.json();
+        return response.data;
     }
 
     /**
      * Helper function to create headers for request
      * @param extraHeaders Any extra header options
      */
-    createHeader(extraHeaders?: Headers): Headers {
+    createHeader(authRequired?: boolean, extraHeaders?: Headers): Headers {
         // Create header
-        let headers: Headers = new Headers();
-        headers.set('Host', 'mobileapi.jumbo.com');
-        headers.set('Accept', 'application/json');
-        headers.set('Content-Type', 'application/json');
-        headers.set('User-Agent', 'jumbo-wrapper');
-
-        // Add fields from extraHeaders to headers
-        extraHeaders?.forEach((value: string, name: string) => {
-            headers.set(name, value);
-        });
+        let headers: Headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'jumbo-wrapper',
+            ...extraHeaders,
+        };
+        if (authRequired && this.tokenHandler) {
+            headers['x-jumbo-token'] = this.tokenHandler.getToken();
+        } else if (authRequired && !this.tokenHandler) {
+            throw new Error('You must be logged in to use this function');
+        }
 
         // Return the headers
         return headers;
@@ -142,5 +258,9 @@ export enum requestMethod {
  * Query interface that is converted to {@URLSearchParams}
  */
 export interface Query {
+    [key: string]: string;
+}
+
+export interface Headers {
     [key: string]: string;
 }

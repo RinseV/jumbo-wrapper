@@ -104,42 +104,47 @@ interface Entry {
     percentage: string;
 }
 
-interface BadgesToDisplay {
+export interface BadgesToDisplay {
     leftTop: LeftTop;
+}
+
+export interface Badge {
+    image: string;
 }
 
 interface LeftTop {
     image: string;
 }
 
-interface ImageInfo {
+export interface ImageInfo {
     primaryView: PrimaryView[];
-    lifeStyle: PrimaryView[];
-    details: PrimaryView[];
+    lifeStyle?: PrimaryView[];
+    details?: PrimaryView[];
 }
 
-interface PrimaryView {
+export interface PrimaryView {
     url: string;
     width: number;
     height: number;
 }
 
-interface Prices {
+export interface Prices {
     price: Price;
+    promotionalPrice: Price;
     unitPrice: UnitPrice;
 }
 
-interface UnitPrice {
+export interface UnitPrice {
     unit: string;
-    price: Price;
+    price?: Price;
 }
 
-interface Price {
+export interface Price {
     currency: string;
     amount: number;
 }
 
-interface QuantityOption {
+export interface QuantityOption {
     defaultAmount: number;
     minimumAmount: number;
     amountStep: number;

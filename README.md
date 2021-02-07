@@ -24,8 +24,8 @@ const product = await jumbo.product().getProductFromId('67649PAK');
 
 ### Functions
 
+You **don't** need to be logged in to use the following functions:
 #### Products
-You don't need to be logged in to find products.
 ```javascript
 // Returns product with given ID
 Jumbo.product().getProductFromId(productId); 
@@ -35,8 +35,19 @@ Jumbo.product().getProductsFromName(productName, offset, limit, filters);
 Jumbo.product().getFirstProductFromName(productName); 
 ```
 
-#### Stores TODO
-You don't need to be logged in to find stores.
+#### Promotions
+```javascript
+// Returns promotion of given store (via store ID)
+Jumbo.promotion().getPromotionsFromStore(storeId);
+```
+
+#### Recipes
+```javascript
+// Returns recipe of given recipe ID
+Jumbo.recipe().getRecipeFromId(recipeId);
+```
+
+#### Stores
 ```javascript
 // Returns store with given ID
 Jumbo.store().getStoreFromId(storeId);
@@ -46,14 +57,23 @@ Jumbo.store().getStoresFromLongLat(long, lat);
 Jumbo.store().getNearestStoreFromLongLat(long, lat);
 ```
 
-#### Orders TODO
-To get your orders, you must be logged in, see [Auth](#Auth).
+You **do** need to be logged in to use the following functions, for instructions how to login, see [Auth](#Auth).
+#### Orders
 ```javascript
+// Returns order from ID (if order is yours)
+Jumbo.order().getMyOrderById(orderId);
 // Returns all of your orders
 Jumbo.order().getMyOrders();
 // Returns your latest order (must be logged in)
 Jumbo.order().getLatestOrder();
 ```
+
+#### Users
+```javascript
+// Returns info of currently logged in user
+Jumbo.user().getMyInfo();
+```
+
 
 ### Example usage
 For all of these examples, please keep in mind that your function in which you request something should be ``async`` since the requests return a ``Promise``.
@@ -101,13 +121,28 @@ findJumboStore(4.4993409, 51.9106489);
 Jumbo Rotterdam Vijf Werelddelen
 ```
 
+#### Order
+If I want to see the ID of the latest order of my Jumbo account:
+```javascript
+import { Jumbo } from 'jumbo-wrapper';
+
+async function getLatestOrder(username: string, password: string): string {
+    const jumbo = new Jumbo(username, password);
+    const res = await jumbo.order().getMyLatestOrder();
+    console.log(res.order.data.id);
+}
+
+findJumboStore({username}, {password});
+```
+Keep in mind that you need to be logged in to get your orders, for instructions see [Auth](#Auth).
+
 ## Auth
 The token is created via creation of the ```Jumbo``` object:
 ```javascript
 const jumbo = new Jumbo(username, password);
-const token = jumbo.token;
 ```
-Once authenticated, you'll be able to access your orders:
+Once authenticated, you'll be able to access your orders as well as see your user information:
 ```javascript
-const orders = jumbo.orders().getMyOrders();
+const orders = await jumbo.orders().getMyOrders();
+const users = await jumbo.users().getMyInfo();
 ```
