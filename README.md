@@ -2,11 +2,11 @@
 Node.js API wrapper for [Jumbo](https://www.jumbo.com/).
 
 ## Installation
-```npm
+```sh
 npm install jumbo-wrapper
 ``` 
 or 
-```npm
+```sh
 yarn add jumbo-wrapper
 ```
 then
@@ -74,7 +74,7 @@ async function findFirstFiveProducts(productName: string): string[] {
 
 findFirstFiveProducts("melk");
 ```
-```node
+```sh
 [
   'Jumbo Verse Halfvolle Melk 2L',
   'Jumbo Verse Halfvolle Melk 1L',
@@ -97,7 +97,7 @@ async function findJumboStore(longitude: number, latitude: number): string {
 
 findJumboStore(4.4993409, 51.9106489);
 ```
-```node
+```sh
 Jumbo Rotterdam Vijf Werelddelen
 ```
 
