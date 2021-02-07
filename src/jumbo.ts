@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+import { Headers, RequestInit } from 'node-fetch';
 import { Product } from './product/product';
 require('dotenv').config();
 const endpoint = process.env.ENDPOINT;
@@ -45,35 +46,21 @@ export class Jumbo {
     async request(
         path: string,
         method: requestMethod,
-        body?: BodyInit,
+        body?: any,
         extraHeaders?: Headers,
         query?: Query
     ) {
         // Create initial header properties
         let requestHeaders: Headers = this.createHeader(extraHeaders);
 
-        // Change URL and body based on method
-        let url: string;
-        let bodyContent: any;
-        switch (method) {
-            case requestMethod.GET:
-                url = this.createURL(path, query);
-                break;
-            case requestMethod.POST:
-            case requestMethod.PUT:
-                url = this.createURL(path);
-                bodyContent = body;
-                break;
-            default:
-                url = this.createURL(path);
-                break;
-        }
+        // Add query to URL if given
+        let url: string = this.createURL(path, query);
 
         // Create request options with method, headers and body
-        let requestOptions = {
+        let requestOptions: RequestInit = {
             method: method,
             headers: requestHeaders,
-            body: bodyContent,
+            body: body,
         };
 
         // Log if verbose
@@ -99,15 +86,17 @@ export class Jumbo {
      * @param extraHeaders Any extra header options
      */
     createHeader(extraHeaders?: Headers): Headers {
-        // Create header with Accept
-        let headers: Headers = {
-            Host: 'mobileapi.jumbo.com',
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        };
+        // Create header
+        let headers: Headers = new Headers();
+        headers.set('Host', 'mobileapi.jumbo.com');
+        headers.set('Accept', 'application/json');
+        headers.set('Content-Type', 'application/json');
+        headers.set('User-Agent', 'jumbo-wrapper');
 
         // Add fields from extraHeaders to headers
-        headers = { ...headers, ...extraHeaders };
+        extraHeaders?.forEach((value: string, name: string) => {
+            headers.set(name, value);
+        });
 
         // Return the headers
         return headers;
@@ -122,8 +111,8 @@ export class Jumbo {
         let url: string;
         // Add query if given
         if (query) {
-            let searchParams = new URLSearchParams(query);
-            url = endpoint + path + '?' + searchParams;
+            const params = new URLSearchParams(query);
+            url = endpoint + path + '?' + params;
         } else {
             url = endpoint + path;
         }
@@ -133,16 +122,18 @@ export class Jumbo {
     }
 }
 
-export interface Query {
-    [key: string]: string;
-}
-
-export interface Headers {
-    [key: string]: string;
-}
-
+/**
+ * Simple enum for different request methods
+ */
 export enum requestMethod {
     GET = 'GET',
     POST = 'POST',
     PUT = 'PUT',
+}
+
+/**
+ * Query interface that is converted to {@URLSearchParams}
+ */
+export interface Query {
+    [key: string]: string;
 }

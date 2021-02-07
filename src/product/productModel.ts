@@ -1,121 +1,148 @@
 export interface ProductModel {
+    product: Product;
+}
+
+interface Product {
     data: ProductData;
 }
 
 export interface ProductData {
-    additiveInfo: AdditiveInfo;
-    allergyInfo: AllergyInfo;
-    allergyText: string;
-    available: boolean;
-    badge: ProductBadge;
-    brandInfo: BrandInfo;
-    crossSellSKUList: string[];
-    detailsText: string;
-    hasRelatedProducts: boolean;
-    healthClaimInfo: string;
     id: string;
-    imageInfo: ImageInfo[];
-    ingredientInfo: IngredientInfo[];
-    nixProduct: boolean;
-    nutritionalClaimInfo: string;
-    nutritionalInformation: NutritionalInformation;
-    prices: Prices;
-    productType: string;
-    quantity: string;
-    quantityOptions: QuantityOptions;
-    regulatedTitle: string;
-    stickerBadges: string[];
     title: string;
+    quantityOptions: QuantityOption[];
+    prices: Prices;
+    available: boolean;
+    productType: string;
+    crossSellSKUList: any[];
+    quantity: string;
+    imageInfo: ImageInfo;
+    badgesToDisplay: BadgesToDisplay;
+    badge: LeftTop;
+    stickerBadges: string[];
     topLevelCategory: string;
     topLevelCategoryId: string;
-    usageAndSafetyInfo: UsageAndSafetyInfo;
-}
-
-export interface UsageAndSafetyInfo {
-    recyclingInfo: string;
-    storageType: string;
-}
-
-export interface QuantityOptions {
-    amountStep: number;
-    defaultAmount: number;
-    maximumAmount: number;
-    minimumAmount: number;
-    unit: string;
-}
-
-export interface Prices {
-    price: Price;
-    unitPrice: UnitPrice;
-}
-
-export interface Price {
-    amount: number;
-    currency: string;
-}
-
-export interface UnitPrice {
-    price: Price;
-    unit: string;
-}
-
-export interface NutritionalInformation {
-    nutritionalData: NutritionalData;
-    nutritionalGuidelines: NutritionalData;
-    productTitle: string;
-}
-
-export interface NutritionalData {
-    entries: Nutrition[];
-    portionSize: string;
-}
-
-export interface Nutrition {
-    name: string;
-    valuePer100g: string;
-    valuePerPortion: string;
-}
-
-export interface AdditiveInfo {
-    thirdparty: string;
-}
-
-export interface AllergyInfo {
+    nixProduct: boolean;
+    hasRelatedProducts: boolean;
+    nutritionalInformation: NutritionalInformation[];
+    detailsText: string;
+    regulatedTitle: string;
     allergyText: string;
+    nutritionalClaimInfo: string;
+    healthClaimInfo: string;
+    ingredientInfo: IngredientInfo[];
+    allergyInfo: AllergyInfo;
+    usageAndSafetyInfo: UsageAndSafetyInfo;
+    additiveInfo: AdditiveInfo;
+    brandInfo: BrandInfo;
 }
 
-export interface ProductBadge {
-    image: string;
-}
-
-export interface BrandInfo {
+interface BrandInfo {
     brandDescription: string;
     manufacturerAddress: string;
     webAddress: string;
 }
 
-export interface ImageInfo {
-    details: ImageDetail[];
-    lifeStyle: ImageDetail[];
-    primaryView: ImageDetail[];
+interface AdditiveInfo {
+    thirdparty: string;
 }
 
-export interface ImageDetail {
-    height: number;
+interface UsageAndSafetyInfo {
+    storageType: string;
+    recyclingInfo: string;
+}
+
+interface AllergyInfo {
+    allergyText: string;
+}
+
+interface IngredientInfo {
+    productTitle: string;
+    ingredients: Ingredient[];
+    allergens: Allergen[];
+}
+
+interface Allergen {
+    name: string;
+    highlights: Highlight[];
+}
+
+interface Ingredient {
+    name: string;
+    containsAllergens: boolean;
+    highlights: Highlight[];
+}
+
+interface Highlight {
+    length: number;
+    offset: number;
+}
+
+interface NutritionalInformation {
+    productTitle: string;
+    nutritionalGuidelines: NutritionalGuidelines;
+    nutritionalData: NutritionalData;
+}
+
+interface NutritionalData {
+    entries: Entry2[];
+    portionSize: string;
+}
+
+interface Entry2 {
+    name: string;
+    valuePer100g: string;
+    valuePerPortion: string;
+}
+
+interface NutritionalGuidelines {
+    entries: Entry[];
+}
+
+interface Entry {
+    name: string;
+    quantity: string;
+    percentage: string;
+}
+
+interface BadgesToDisplay {
+    leftTop: LeftTop;
+}
+
+interface LeftTop {
+    image: string;
+}
+
+interface ImageInfo {
+    primaryView: PrimaryView[];
+    lifeStyle: PrimaryView[];
+    details: PrimaryView[];
+}
+
+interface PrimaryView {
     url: string;
     width: number;
+    height: number;
 }
 
-export interface IngredientInfo {
-    allergens: Allergens[];
-    ingredients: Ingredient[];
+interface Prices {
+    price: Price;
+    unitPrice: UnitPrice;
 }
 
-export interface Allergens {
-    name: string;
+interface UnitPrice {
+    unit: string;
+    price: Price;
 }
 
-export interface Ingredient {
-    containsAllergens: true;
-    name: string;
+interface Price {
+    currency: string;
+    amount: number;
+}
+
+interface QuantityOption {
+    defaultAmount: number;
+    minimumAmount: number;
+    amountStep: number;
+    unit: string;
+    maximumAmount: number;
 }
