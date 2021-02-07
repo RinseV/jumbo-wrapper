@@ -1,11 +1,13 @@
 const fetch = require('node-fetch');
 import { Headers, RequestInit } from 'node-fetch';
 import { Product } from './product/product';
+import { Store } from './store/store';
 require('dotenv').config();
 const endpoint = process.env.ENDPOINT;
 
 export class Jumbo {
     jumboProduct: Product;
+    jumboStore: Store;
 
     constructor(
         private readonly username?: string,
@@ -13,10 +15,15 @@ export class Jumbo {
         private readonly verbose?: boolean
     ) {
         this.jumboProduct = new Product(this);
+        this.jumboStore = new Store(this);
     }
 
     product() {
         return this.jumboProduct;
+    }
+
+    store() {
+        return this.jumboStore;
     }
 
     /**
