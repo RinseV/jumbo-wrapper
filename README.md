@@ -141,6 +141,17 @@ The token is created via creation of the ```Jumbo``` object:
 ```javascript
 const jumbo = new Jumbo(username, password);
 ```
+Since you need a username and password, I'd recommend providing them via a ``.env`` file. A ``.env.example`` file is provided, once your username and password are filled in, you can create a ``Jumbo`` object as follows:
+```javascript
+require('dotenv').config({ path: '.env.local' });
+const username = process.env.JUMBO_USERNAME;
+const password = process.env.JUMBO_PASSWORD;
+
+const jumbo = new Jumbo(username, password);
+```
+Keep in mind that you do need the [dotenv](https://www.npmjs.com/package/dotenv) package to load ``.env`` files.
+
+
 Once authenticated, you'll be able to access your orders as well as see your user information:
 ```javascript
 const orders = await jumbo.orders().getMyOrders();

@@ -7,8 +7,7 @@ import { Order } from './order/order';
 import { Promotion } from './promotion/promotion';
 import { Recipe } from './recipe/recipe';
 import { User } from './user/user';
-require('dotenv').config();
-const endpoint = process.env.ENDPOINT;
+const endpoint = 'https://mobileapi.jumbo.com/v12/';
 
 export class Jumbo {
     private readonly client: AxiosInstance;
