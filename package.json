@@ -2,6 +2,7 @@
   "name": "jumbo-wrapper",
   "version": "1.0.0",
   "description": "API Wrapper for Jumbo",
+  "keywords": ["jumbo"],
   "main": "dist/jumbo.js",
   "types": "dist/jumbo.d.ts",
   "author": "RinseV",
@@ -22,5 +23,12 @@
   },
   "dependencies": {
     "axios": "^0.21.1"
-  }
+  },
+  "homepage": "https://github.com/RinseV/jumbo-wrapper",
+  "bugs": "https://github.com/RinseV/jumbo-wrapper/issues",
+  "repository": {
+    "url": "https://github.com/RinseV/jumbo-wrapper",
+    "type": "git"
+  },
+  "readme": ""
 }
