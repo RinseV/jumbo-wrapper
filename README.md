@@ -136,6 +136,23 @@ findJumboStore({username}, {password});
 ```
 Keep in mind that you need to be logged in to get your orders, for instructions see [Auth](#Auth).
 
+### Advanced usage
+Every request can also be provided with additional headers and queries. If you want to add your own headers or queries to any request, simply do the following:
+```javascript
+import { Headers, Query } from '../jumbo';
+
+const myHeaders: Headers = {
+    "Connection": "keep-alive",
+}
+
+const myQueries: Query = {
+    "distance": "15000"
+}
+
+const store = await jumbo.store().getStoresFromLongLat(long, lat, undefined, undefined, myHeaders, myQueries);
+```
+Keep in mind that you must use the ``Headers`` and ``Query`` interfaces defined in ``../jumbo``.
+
 ## Auth
 The token is created via creation of the ```Jumbo``` object:
 ```javascript
