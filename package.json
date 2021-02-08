@@ -1,8 +1,10 @@
 {
   "name": "jumbo-wrapper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "API Wrapper for Jumbo",
-  "keywords": ["jumbo"],
+  "keywords": [
+    "jumbo"
+  ],
   "main": "dist/jumbo.js",
   "types": "dist/jumbo.d.ts",
   "author": "RinseV",
