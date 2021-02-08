@@ -1,6 +1,8 @@
 # Jumbo API Wrapper
 Node.js API wrapper for [Jumbo](https://www.jumbo.com/).
 
+This package is still a work in progress.
+
 ## Installation
 ```sh
 npm install jumbo-wrapper

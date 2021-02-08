@@ -1,2 +1,8 @@
 .env
-src/index.ts
+src
+.eslintrc
+.gitignore
+.npmignore
+.pretterrc
+yarn-error.log
+node_modules/
