@@ -1,5 +1,6 @@
 app
 .env
+.env.local
 src
 .eslintrc
 .gitignore
