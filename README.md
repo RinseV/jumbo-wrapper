@@ -6,7 +6,7 @@
   <p>
     <a href="https://www.npmjs.com/package/jumbo-wrapper"><img src="https://img.shields.io/npm/v/jumbo-wrapper" alt="NPM version" /></a>
     <a href="https://github.com/RinseV/jumbo-wrapper"><img src="https://img.shields.io/npm/l/jumbo-wrapper" alt="NPM license" /></a>
-    <a href="https://www.npmjs.com/package/jumbo-wrapper"><img src="https://img.shields.io/david/RinseV/jumbo-wrapper" alt="NPM dependencies"/></a>
+    <a href="https://www.npmjs.com/package/jumbo-wrapper"><img src="https://david-dm.org/RinseV/jumbo-wrapper.svg" alt="NPM dependencies"/></a>
   </p>
   <p>
     <a href="https://nodei.co/npm/jumbo-wrapper/"><img src="https://nodei.co/npm/jumbo-wrapper.svg" alt="npm installnfo" /></a>
