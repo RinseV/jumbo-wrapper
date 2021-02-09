@@ -1,7 +1,7 @@
 import { Headers, Query } from '../jumbo';
 import { JumboObject } from '../base/jumboObject';
 import { ProductModel } from './productModel';
-import { ProductQueryModel } from './productQueryModel';
+import { ProductQueryModel, ProductSortOptions } from './productQueryModel';
 
 export class Product extends JumboObject {
     /**
@@ -21,13 +21,15 @@ export class Product extends JumboObject {
      * @param productName Product name to search for
      * @param offset Offset in search (default 0)
      * @param limit Amount of products returned (default 10)
-     * @param filters Any extra filters
+     * @param filters Any extra filters (in the form of a number)
+     * @param sort Sort options as defined in ./productModel
      */
     async getProductsFromName(
         productName: string,
         offset?: number,
         limit?: number,
-        filters?: string,
+        filters?: number,
+        sort?: ProductSortOptions,
         headers?: Headers,
         query?: Query
     ): Promise<ProductModel[]> {
@@ -39,7 +41,8 @@ export class Product extends JumboObject {
                 q: productName,
                 offset: (offset ? offset : 0).toString(),
                 limit: (limit ? limit : 10).toString(),
-                filters: filters ? filters : '',
+                filters: (filters ? filters : '').toString(),
+                sort: (sort ? sort : '').toString(),
                 ...query,
             }
         );
@@ -60,9 +63,11 @@ export class Product extends JumboObject {
     /**
      * Shortcut function to get the first product when searching for name
      * @param productName Product name to search for
+     * @param sort Sort options as defined in ./productModel
      */
     async getFirstProductFromName(
         productName: string,
+        sort?: ProductSortOptions,
         headers?: Headers,
         query?: Query
     ): Promise<ProductModel> {
@@ -71,6 +76,7 @@ export class Product extends JumboObject {
             0,
             1,
             undefined,
+            sort,
             headers,
             query
         );

@@ -7,11 +7,15 @@ import { Order } from './order/order';
 import { Promotion } from './promotion/promotion';
 import { Recipe } from './recipe/recipe';
 import { User } from './user/user';
+import { Category } from './category/category';
+import { List } from './list/list';
 const endpoint = 'https://mobileapi.jumbo.com/v12/';
 
 export class Jumbo {
     private readonly client: AxiosInstance;
 
+    jumboCategory: Category;
+    jumboList: List;
     jumboOrder: Order;
     jumboProduct: Product;
     jumboPromotion: Promotion;
@@ -32,6 +36,8 @@ export class Jumbo {
             }),
         });
         // Set separate classes
+        this.jumboCategory = new Category(this, false);
+        this.jumboList = new List(this, false);
         this.jumboOrder = new Order(this, true);
         this.jumboProduct = new Product(this, false);
         this.jumboPromotion = new Promotion(this, false);
@@ -42,6 +48,14 @@ export class Jumbo {
         if (username && password) {
             this.login(username, password);
         }
+    }
+
+    category() {
+        return this.jumboCategory;
+    }
+
+    list() {
+        return this.jumboList;
     }
 
     order() {
@@ -75,6 +89,34 @@ export class Jumbo {
      */
     login(username: string, password: string) {
         this.tokenHandler = new TokenHandler(this, username, password);
+    }
+
+    /**
+     * PUT request
+     * @param path Endpoint URL (without start)
+     * @param body Body of PUT (if any)
+     * @param extraHeaders Any extra headers
+     * @param query Any query options
+     * @param authRequired Whether a token is required for the function
+     * @param fullResponse Returns response + headers instead of only data
+     */
+    async put(
+        path: string,
+        body?: any,
+        extraHeaders?: Headers,
+        query?: Query,
+        authRequired?: boolean,
+        fullResponse?: boolean
+    ) {
+        return this.request(
+            path,
+            requestMethod.PUT,
+            body,
+            extraHeaders,
+            query,
+            authRequired,
+            fullResponse
+        );
     }
 
     /**

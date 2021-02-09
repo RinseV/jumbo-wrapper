@@ -14,17 +14,17 @@ interface Recipe {
     data: RecipeData;
 }
 
-interface RecipeData {
-    calories: number;
+export interface RecipeData {
+    calories?: number;
     cookingTime: number;
-    cookingTip: string;
-    course: string;
-    difficultyLevel: string;
-    dishType: string;
+    cookingTip?: string;
+    course?: string;
+    difficultyLevel?: string;
+    dishType?: string;
     id: string;
     imageInfo: ImageInfo;
-    ingredients: Ingredient[];
-    instructions: string[];
+    ingredients?: Ingredient[];
+    instructions?: string[];
     name: string;
     numberOfPortions: number;
     webUrl: string;

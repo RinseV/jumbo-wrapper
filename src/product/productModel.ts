@@ -84,28 +84,29 @@ interface NutritionalInformation {
 }
 
 interface NutritionalData {
-    entries: Entry2[];
+    entries: NutritionalDataEntry[];
     portionSize: string;
 }
 
-interface Entry2 {
+interface NutritionalDataEntry {
     name: string;
     valuePer100g: string;
     valuePerPortion: string;
 }
 
 interface NutritionalGuidelines {
-    entries: Entry[];
+    entries: NutritionalGuideline[];
 }
 
-interface Entry {
+interface NutritionalGuideline {
     name: string;
     quantity: string;
     percentage: string;
 }
 
 export interface BadgesToDisplay {
-    leftTop: LeftTop;
+    leftTop?: LeftTop;
+    rightTop?: LeftTop;
 }
 
 export interface Badge {
@@ -130,7 +131,7 @@ export interface PrimaryView {
 
 export interface Prices {
     price: Price;
-    promotionalPrice: Price;
+    promotionalPrice?: Price;
     unitPrice: UnitPrice;
 }
 
