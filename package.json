@@ -1,6 +1,6 @@
 {
   "name": "jumbo-wrapper",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "API Wrapper for Jumbo",
   "keywords": [
     "jumbo"
@@ -17,7 +17,6 @@
   "devDependencies": {
     "@types/node": "^14.14.25",
     "@types/node-fetch": "^2.5.8",
-    "@types/qs": "^6.9.5",
     "dotenv": "^8.2.0",
     "ts-node": "^9.1.1",
     "tsc": "^1.20150623.0",
