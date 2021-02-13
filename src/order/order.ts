@@ -216,5 +216,6 @@ export class Order extends JumboObject {
 export enum OrderStatus {
     Processing = 'PROCESSING',
     Open = 'OPEN',
+    ReadyToDeliver = 'READY_TO_DELIVER',
     Completed = 'PICKED_UP',
 }
