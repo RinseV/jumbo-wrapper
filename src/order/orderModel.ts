@@ -8,31 +8,38 @@ interface Order {
 
 export interface OrderData {
     created: number;
-    delivery: Delivery;
+    delivery: DeliveryDate;
     id: string;
     leftToPay?: Price;
     numberOfCrates?: number;
     numberOfPlasticBags?: number;
-    orderCutOffDate: number;
+    orderCutOffDate: Date;
     orderProducts?: OrderProduct[];
     paymentMethod?: string;
     payments?: Payment[];
     pickedUp?: number;
     prices?: OrderPrice | OrderQueryPrice;
-    shipping?: Shipping;
+    shipping?: ShippingDate;
     status: string;
     storeID?: string;
     type: string;
 }
 
-interface Shipping {
-    liveETA: number;
+export interface Shipping {
+    liveETA?: number;
     plannedETAEnd: number;
     plannedETAStart: number;
     unknownLiveETA: boolean;
 }
 
-interface OrderPrice {
+export interface ShippingDate {
+    liveETA?: Date;
+    plannedETAEnd: Date;
+    plannedETAStart: Date;
+    unknownLiveETA: boolean;
+}
+
+export interface OrderPrice {
     depositsReturned: Price;
     itemTotal: Price;
     paid: Price;
@@ -48,7 +55,7 @@ interface OrderPrice {
     totalVatLow: Price;
 }
 
-interface Payment {
+export interface Payment {
     date: number;
     merchantReference: string;
     price: Price;
@@ -57,7 +64,7 @@ interface Payment {
     type: string;
 }
 
-interface OrderProduct {
+export interface OrderProduct {
     product: Product;
     quantity: Quantity;
     sample: boolean;
@@ -128,12 +135,23 @@ interface Badge {
 
 export interface Delivery {
     address: Address;
-    collectionDateTime: number;
+    collectionDateTime?: number;
     date: number;
     endDateTime: number;
     location: Location;
     price: Price;
     startDateTime: number;
+    time: string;
+}
+
+export interface DeliveryDate {
+    address: Address;
+    collectionDateTime?: Date;
+    date: Date;
+    endDateTime: Date;
+    location: Location;
+    price: Price;
+    startDateTime: Date;
     time: string;
 }
 
