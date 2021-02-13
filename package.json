@@ -1,6 +1,6 @@
 {
   "name": "jumbo-wrapper",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "API Wrapper for Jumbo",
   "keywords": [
     "jumbo"
@@ -23,7 +23,8 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "date-fns": "^2.17.0"
   },
   "homepage": "https://github.com/RinseV/jumbo-wrapper",
   "bugs": "https://github.com/RinseV/jumbo-wrapper/issues",
