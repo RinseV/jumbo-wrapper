@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Product } from './product/product';
 import { Store } from './store/store';
 import { TokenHandler } from './auth/tokenHandler';
@@ -24,17 +24,26 @@ export class Jumbo {
     jumboUser: User;
     tokenHandler?: TokenHandler;
 
+    /**
+     * @param username Jumbo username
+     * @param password Jumbo password
+     * @param verbose Whether requests should be logged in the console
+     * @param config Custom Axios config, must use 'TLSv1.2' as TLS version
+     */
     constructor(
         private readonly username?: string,
         private readonly password?: string,
-        private readonly verbose?: boolean
+        private readonly verbose?: boolean,
+        private readonly config?: AxiosRequestConfig
     ) {
         // Create https agent for TLSv1.2 or less (API doesn't respond to TLSv1.3+)
-        this.client = axios.create({
-            httpsAgent: new https.Agent({
-                maxVersion: 'TLSv1.2',
-            }),
-        });
+        this.client = config
+            ? axios.create(config)
+            : axios.create({
+                  httpsAgent: new https.Agent({
+                      maxVersion: 'TLSv1.2',
+                  }),
+              });
         // Set separate classes
         this.jumboCategory = new Category(this, false);
         this.jumboList = new List(this, false);

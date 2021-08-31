@@ -1,3 +1,5 @@
+import { Price } from '../product/productModel';
+
 export interface OrderModel {
     order: Order;
 }
@@ -153,11 +155,6 @@ export interface DeliveryDate {
     price: Price;
     startDateTime: Date;
     time: string;
-}
-
-export interface Price {
-    amount: number;
-    currency: string;
 }
 
 export interface Location {
