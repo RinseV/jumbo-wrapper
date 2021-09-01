@@ -226,7 +226,7 @@ async function getLatestOrder(username: string, password: string) {
     console.log(res.order.data.id);
 }
 
-findJumboStore({ username }, { password });
+getLatestOrder('example@mail.com', 'password');
 ```
 
 Keep in mind that you need to be logged in to get your orders, for instructions see [Auth](#Auth).
@@ -298,6 +298,8 @@ const jumbo = new Jumbo(undefined, undefined, false, axiosConfig);
 ```
 
 ## Auth
+
+<b>NOTE:</b> Authentication is currently not working, for more info see [this issue](https://github.com/RinseV/jumbo-wrapper/issues/1).
 
 The token is created via creation of the `Jumbo` object:
 
