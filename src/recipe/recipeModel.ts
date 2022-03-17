@@ -1,10 +1,4 @@
-import {
-    QuantityOption,
-    ImageInfo,
-    Prices,
-    BadgesToDisplay,
-    Badge,
-} from '../product/productModel';
+import { QuantityOption, ImageInfo, Prices, BadgesToDisplay, Badge } from '../product/productModel';
 
 export interface RecipeModel {
     recipe: Recipe;

@@ -1,12 +1,5 @@
 import { Price } from '../product/productModel';
-import {
-    Delivery,
-    OrderPrice,
-    OrderProduct,
-    OrderQueryPrice,
-    Payment,
-    Shipping,
-} from './orderModel';
+import { Delivery, OrderPrice, OrderProduct, OrderQueryPrice, Payment, Shipping } from './orderModel';
 
 export interface OrderQueryModel {
     orders: OrderModel;

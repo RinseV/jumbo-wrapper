@@ -9,7 +9,7 @@ import { Recipe } from './recipe/recipe';
 import { User } from './user/user';
 import { Category } from './category/category';
 import { List } from './list/list';
-const endpoint = 'https://mobileapi.jumbo.com/v12/';
+const endpoint = 'https://mobileapi.jumbo.com/v17/';
 
 export class Jumbo {
     private readonly client: AxiosInstance;
@@ -41,8 +41,8 @@ export class Jumbo {
             ? axios.create(config)
             : axios.create({
                   httpsAgent: new https.Agent({
-                      maxVersion: 'TLSv1.2',
-                  }),
+                      maxVersion: 'TLSv1.2'
+                  })
               });
         // Set separate classes
         this.jumboCategory = new Category(this, false);
@@ -117,15 +117,7 @@ export class Jumbo {
         authRequired?: boolean,
         fullResponse?: boolean
     ) {
-        return this.request(
-            path,
-            requestMethod.PUT,
-            body,
-            extraHeaders,
-            query,
-            authRequired,
-            fullResponse
-        );
+        return this.request(path, requestMethod.PUT, body, extraHeaders, query, authRequired, fullResponse);
     }
 
     /**
@@ -145,15 +137,7 @@ export class Jumbo {
         authRequired?: boolean,
         fullResponse?: boolean
     ) {
-        return this.request(
-            path,
-            requestMethod.POST,
-            body,
-            extraHeaders,
-            query,
-            authRequired,
-            fullResponse
-        );
+        return this.request(path, requestMethod.POST, body, extraHeaders, query, authRequired, fullResponse);
     }
 
     /**
@@ -164,22 +148,8 @@ export class Jumbo {
      * @param authRequired Whether a token is required for the function
      * @param fullResponse Returns response + headers instead of only data
      */
-    async get(
-        path: string,
-        extraHeaders?: Headers,
-        query?: Query,
-        authRequired?: boolean,
-        fullResponse?: boolean
-    ) {
-        return this.request(
-            path,
-            requestMethod.GET,
-            undefined,
-            extraHeaders,
-            query,
-            authRequired,
-            fullResponse
-        );
+    async get(path: string, extraHeaders?: Headers, query?: Query, authRequired?: boolean, fullResponse?: boolean) {
+        return this.request(path, requestMethod.GET, undefined, extraHeaders, query, authRequired, fullResponse);
     }
 
     /**
@@ -204,11 +174,7 @@ export class Jumbo {
         // If auth is required and we don't have a token yet, we should create one
         if (authRequired) {
             if (!this.tokenHandler) {
-                throw new Error(
-                    `You must be logged in to access this path: ${
-                        endpoint + path
-                    }`
-                );
+                throw new Error(`You must be logged in to access this path: ${endpoint + path}`);
             } else {
                 // If the tokenHandler doesn't have a token yet, make sure it gets one
                 await this.tokenHandler.Ready;
@@ -216,10 +182,7 @@ export class Jumbo {
         }
 
         // Create initial header properties
-        let requestHeaders: Headers = this.createHeader(
-            authRequired,
-            extraHeaders
-        );
+        let requestHeaders: Headers = this.createHeader(authRequired, extraHeaders);
 
         // Add query to URL if given
         let url: string = this.createURL(path, query);
@@ -237,7 +200,7 @@ export class Jumbo {
             method: method,
             url: url,
             headers: requestHeaders,
-            data: body,
+            data: body
         });
 
         // Throw error if response not ok
@@ -263,7 +226,7 @@ export class Jumbo {
         let headers: Headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'jumbo-wrapper',
-            ...extraHeaders,
+            ...extraHeaders
         };
         if (authRequired && this.tokenHandler) {
             headers['x-jumbo-token'] = this.tokenHandler.getToken();
@@ -301,7 +264,7 @@ export class Jumbo {
 export enum requestMethod {
     GET = 'GET',
     POST = 'POST',
-    PUT = 'PUT',
+    PUT = 'PUT'
 }
 
 /**

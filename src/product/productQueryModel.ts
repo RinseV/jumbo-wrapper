@@ -31,7 +31,17 @@ interface HorizontalFilterData {
 }
 
 interface Filter {
-    data: FilterData[];
+    data: (ActiveFilter | FilterData)[];
+}
+
+interface ActiveFilter {
+    count: number;
+    dimensionName: string;
+    ifRemovedFilters: string;
+    isCategory: boolean;
+    multiSelect: boolean;
+    title: string;
+    type: string;
 }
 
 interface FilterData {
@@ -51,16 +61,4 @@ interface Products {
     data: ProductData[];
     total: number;
     offset: number;
-}
-
-/**
- * The different sort options for products
- */
-export enum ProductSortOptions {
-    POPULAR = 'P_Sales|1',
-    PRICE_ASC = 'P_Price|0',
-    PRICE_DESC = 'P_Price|1',
-    ALPHAB_ASC = 'P_Title|0',
-    ALPHAB_DESC = 'P_Title|1',
-    PER_WEIGHT_MEASURE = 'pricePerWeightMeasure|0',
 }

@@ -3,8 +3,14 @@ app
 .env.local
 src
 .eslintrc
+.eslintrc.js
 .gitignore
 .npmignore
-.pretterrc
+.prettierrc
 yarn-error.log
 node_modules/
+tsconfig.json
+rollup.config.ts
+.nvmrc
+.gitattributes
+.env.example

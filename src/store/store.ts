@@ -8,11 +8,7 @@ export class Store extends JumboObject {
      * Gets store from store ID
      * @param storeId Store ID
      */
-    async getStoreFromId(
-        storeId: number,
-        headers?: Headers,
-        query?: Query
-    ): Promise<StoreModel> {
+    async getStoreFromId(storeId: number, headers?: Headers, query?: Query): Promise<StoreModel> {
         return this.jumbo.get(`stores/${storeId}`, headers, query);
     }
 
@@ -33,24 +29,20 @@ export class Store extends JumboObject {
         headers?: Headers,
         query?: Query
     ): Promise<StoreModel[]> {
-        const stores: StoreQueryModel = await this.jumbo.get(
-            `stores`,
-            headers,
-            {
-                longitude: long.toString(),
-                latitude: lat.toString(),
-                distance: (distance ? distance : '').toString(),
-                count: (count ? count : 20).toString(),
-                offset: (offset ? offset : 0).toString(),
-                ...query,
-            }
-        );
+        const stores: StoreQueryModel = await this.jumbo.get(`stores`, headers, {
+            longitude: long.toString(),
+            latitude: lat.toString(),
+            distance: (distance ? distance : '').toString(),
+            count: (count ? count : 20).toString(),
+            offset: (offset ? offset : 0).toString(),
+            ...query
+        });
         const result: StoreModel[] = [];
         for (var key in stores.stores.data) {
             const store: StoreModel = {
                 store: {
-                    data: stores.stores.data[key],
-                },
+                    data: stores.stores.data[key]
+                }
             };
             result.push(store);
         }
@@ -62,21 +54,8 @@ export class Store extends JumboObject {
      * @param long Longitude
      * @param lat Latitude
      */
-    async getNearestStoreFromLongLat(
-        long: number,
-        lat: number,
-        headers?: Headers,
-        query?: Query
-    ): Promise<StoreModel> {
-        const stores = await this.getStoresFromLongLat(
-            long,
-            lat,
-            undefined,
-            undefined,
-            undefined,
-            headers,
-            query
-        );
+    async getNearestStoreFromLongLat(long: number, lat: number, headers?: Headers, query?: Query): Promise<StoreModel> {
+        const stores = await this.getStoresFromLongLat(long, lat, undefined, undefined, undefined, headers, query);
         return stores[0];
     }
 }

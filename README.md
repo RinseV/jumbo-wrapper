@@ -170,7 +170,7 @@ import { Jumbo } from 'jumbo-wrapper';
 
 async function findFirstFiveProducts(productName: string) {
     const jumbo = new Jumbo();
-    const products = await jumbo.product().getProductsFromName('melk', 0, 5);
+    const products = await jumbo.product().getProductsFromName(productName, 0, 5);
     console.log(
         products.map((product) => {
             return product.product.data.title;
@@ -180,7 +180,6 @@ async function findFirstFiveProducts(productName: string) {
 
 findFirstFiveProducts('melk');
 ```
-
 ```sh
 [
   'Jumbo Verse Halfvolle Melk 2L',
@@ -190,6 +189,36 @@ findFirstFiveProducts('melk');
   'Jumbo Verse Volle Melk 1L'
 ]
 ```
+
+You can also add diet and allergen filters:
+```javascript
+import { Jumbo, ProductDietFilter } from 'jumbo-wrapper';
+
+async function findLactoseFreeMilk() {
+    const jumbo = new Jumbo();
+    const products = await jumbo.product().getProductsFromName('melk', 0, 5, {
+        diet: [ProductDietFilter.LactoseIntolerant],
+        allergens: [ProductAllergenFilter.Lactose]
+    });
+    console.log(
+        products.map((product) => {
+            return product.product.data.title;
+        })
+    );
+}
+```
+```sh
+[
+  'Alpro This is Not M*lk Drink Halfvol Gekoeld 1L',
+  'Alpro This is Not M*lk Drink Vol Gekoeld 1L',
+  'HiPRO Proteïne Drink Houdbaar Vanille 330ml',
+  'Alpro Sojadrink Houdbaar 1L',
+  'Alpro Barista Haver Houdbaar 1L'
+]
+```
+Keep in mind that Jumbo makes a (good) distinction between the dietary restrictions (lactose intolerant) and allergen restrictions (lactose free). The allergens supplied via the filter are the ones that are **not** allowed in the product.
+
+
 
 #### Store
 
@@ -212,24 +241,6 @@ findJumboStore(4.4993409, 51.9106489);
 ```sh
 Jumbo Rotterdam Vijf Werelddelen
 ```
-
-#### Order
-
-If I want to see the ID of the latest order of my Jumbo account:
-
-```javascript
-import { Jumbo } from 'jumbo-wrapper';
-
-async function getLatestOrder(username: string, password: string) {
-    const jumbo = new Jumbo(username, password);
-    const res = await jumbo.order().getMyLatestOrder();
-    console.log(res.order.data.id);
-}
-
-getLatestOrder('example@mail.com', 'password');
-```
-
-Keep in mind that you need to be logged in to get your orders, for instructions see [Auth](#Auth).
 
 #### List
 
@@ -255,6 +266,26 @@ getFirstThreeListsFromCategory('Winter');
 ```
 
 Keep in mind that while you don't need to be logged in to view public lists, if you want to view your own list you must login first.
+
+#### Order
+
+<b>NOTE:</b> Authentication is currently not working, for more info see [this issue](https://github.com/RinseV/jumbo-wrapper/issues/1).
+
+If I want to see the ID of the latest order of my Jumbo account:
+
+```javascript
+import { Jumbo } from 'jumbo-wrapper';
+
+async function getLatestOrder(username: string, password: string) {
+    const jumbo = new Jumbo(username, password);
+    const res = await jumbo.order().getMyLatestOrder();
+    console.log(res.order.data.id);
+}
+
+getLatestOrder('example@mail.com', 'password');
+```
+
+Keep in mind that you need to be logged in to get your orders, for instructions see [Auth](#Auth).
 
 ### Advanced usage
 

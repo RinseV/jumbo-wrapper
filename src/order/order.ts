@@ -1,17 +1,7 @@
 import { Query, Headers } from '../jumbo';
 import { JumboObject } from '../base/jumboObject';
-import {
-    Delivery,
-    DeliveryDate,
-    OrderModel,
-    Shipping,
-    ShippingDate,
-} from './orderModel';
-import {
-    OrderQueryModel,
-    OrderResponse,
-    SingleOrderQueryModel,
-} from './orderQueryModel';
+import { Delivery, DeliveryDate, OrderModel, Shipping, ShippingDate } from './orderModel';
+import { OrderQueryModel, OrderResponse, SingleOrderQueryModel } from './orderQueryModel';
 import { fromUnixTime } from 'date-fns';
 
 export class Order extends JumboObject {
@@ -19,11 +9,7 @@ export class Order extends JumboObject {
      * Gets order from ID
      * @param orderId Order ID
      */
-    async getMyOrderById(
-        orderId: number,
-        headers?: Headers,
-        query?: Query
-    ): Promise<OrderModel> {
+    async getMyOrderById(orderId: number, headers?: Headers, query?: Query): Promise<OrderModel> {
         // Get order from endpoint
         const order: SingleOrderQueryModel = await this.jumbo.get(
             `users/me/orders/${orderId}`,
@@ -40,12 +26,7 @@ export class Order extends JumboObject {
      * @param offset Offset (default 0)
      * @param count Amount of orders (default 10)
      */
-    async getMyOrders(
-        offset?: number,
-        count?: number,
-        headers?: Headers,
-        query?: Query
-    ): Promise<OrderModel[]> {
+    async getMyOrders(offset?: number, count?: number, headers?: Headers, query?: Query): Promise<OrderModel[]> {
         // Query all orders as orderQueryModel
         const orders: OrderQueryModel = await this.jumbo.get(
             `users/me/orders`,
@@ -53,7 +34,7 @@ export class Order extends JumboObject {
             {
                 offset: (offset ? offset : 0).toString(),
                 count: (count ? count : 10).toString(),
-                ...query,
+                ...query
             },
             this.authRequired
         );
@@ -66,10 +47,7 @@ export class Order extends JumboObject {
     /**
      * Shortcut function to return latest (first) order
      */
-    async getMyLatestOrder(
-        headers?: Headers,
-        query?: Query
-    ): Promise<OrderModel> {
+    async getMyLatestOrder(headers?: Headers, query?: Query): Promise<OrderModel> {
         const orders = await this.getMyOrders(0, 1, headers, query);
         return orders[0];
     }
@@ -78,17 +56,8 @@ export class Order extends JumboObject {
      * Returns all of the user's orders with a certain status
      * @param status Status of the order (Processing, Open, Completed)
      */
-    async getMyOrdersByStatus(
-        status: OrderStatus,
-        headers?: Headers,
-        query?: Query
-    ): Promise<OrderModel[]> {
-        const orders = await this.getMyOrders(
-            undefined,
-            undefined,
-            headers,
-            query
-        );
+    async getMyOrdersByStatus(status: OrderStatus, headers?: Headers, query?: Query): Promise<OrderModel[]> {
+        const orders = await this.getMyOrders(undefined, undefined, headers, query);
         return orders.filter((order) => {
             return order.order.data.status === status;
         });
@@ -98,11 +67,7 @@ export class Order extends JumboObject {
      * Shortcut function to retrieve the latest order that matches the status
      * @param status Status of the order
      */
-    async getMyLatestOrderByStatus(
-        status: OrderStatus,
-        headers?: Headers,
-        query?: Query
-    ): Promise<OrderModel> {
+    async getMyLatestOrderByStatus(status: OrderStatus, headers?: Headers, query?: Query): Promise<OrderModel> {
         const orders = await this.getMyOrdersByStatus(status, headers, query);
         return orders[0];
     }
@@ -110,13 +75,10 @@ export class Order extends JumboObject {
     /**
      * Gets the user's relevant orders (which includes shipping time)
      */
-    async getMyRelevantOrders(
-        headers?: Headers,
-        query?: Query
-    ): Promise<OrderModel[]> {
+    async getMyRelevantOrders(headers?: Headers, query?: Query): Promise<OrderModel[]> {
         const orders = await this.getMyOrders(undefined, undefined, headers, {
             relevant: 'true',
-            ...query,
+            ...query
         });
         return orders;
     }
@@ -132,18 +94,14 @@ export class Order extends JumboObject {
                 data: {
                     ...order,
                     delivery: this.convertDeliveryTimesToDates(order.delivery),
-                    orderCutOffDate: this.convertUnixDateToDate(
-                        order.orderCutOffDate
-                    ),
-                    shipping: undefined,
-                },
-            },
+                    orderCutOffDate: this.convertUnixDateToDate(order.orderCutOffDate),
+                    shipping: undefined
+                }
+            }
         };
         // Add shipping if required
         if (order.shipping) {
-            orderModel.order.data.shipping = this.convertShippingTimesToDates(
-                order.shipping
-            );
+            orderModel.order.data.shipping = this.convertShippingTimesToDates(order.shipping);
         }
         return orderModel;
     }
@@ -154,11 +112,9 @@ export class Order extends JumboObject {
      */
     private convertShippingTimesToDates(shipping: Shipping): ShippingDate {
         const shippingDate: ShippingDate = {
-            plannedETAStart: this.convertUnixDateToDate(
-                shipping.plannedETAStart
-            ),
+            plannedETAStart: this.convertUnixDateToDate(shipping.plannedETAStart),
             plannedETAEnd: this.convertUnixDateToDate(shipping.plannedETAEnd),
-            unknownLiveETA: shipping.unknownLiveETA,
+            unknownLiveETA: shipping.unknownLiveETA
         };
         if (shipping.liveETA) {
             shippingDate.liveETA = this.convertUnixDateToDate(shipping.liveETA);
@@ -184,14 +140,12 @@ export class Order extends JumboObject {
             location: delivery.location,
             price: delivery.price,
             startDateTime: startDate,
-            time: delivery.time,
+            time: delivery.time
         };
 
         // Only convert and add collection date if it's in the original delivery data
         if (delivery.collectionDateTime) {
-            const collectionDate = this.convertUnixDateToDate(
-                delivery.collectionDateTime
-            );
+            const collectionDate = this.convertUnixDateToDate(delivery.collectionDateTime);
             deliveryDate.collectionDateTime = collectionDate;
         }
 
@@ -217,5 +171,5 @@ export enum OrderStatus {
     Processing = 'PROCESSING',
     Open = 'OPEN',
     ReadyToDeliver = 'READY_TO_DELIVER',
-    Completed = 'PICKED_UP',
+    Completed = 'PICKED_UP'
 }

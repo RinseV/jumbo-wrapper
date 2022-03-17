@@ -7,14 +7,10 @@ export class Promotion extends JumboObject {
      * Get all promotions from a given store (by ID)
      * @param storeId Store ID
      */
-    async getPromotionsFromStore(
-        storeId: number,
-        headers?: Headers,
-        query?: Query
-    ): Promise<PromotionModel> {
+    async getPromotionsFromStore(storeId: number, headers?: Headers, query?: Query): Promise<PromotionModel> {
         return await this.jumbo.get(`promotion-overview`, headers, {
             store_id: storeId.toString(),
-            ...query,
+            ...query
         });
     }
 }

@@ -1,9 +1,4 @@
-import {
-    BadgesToDisplay,
-    QuantityOption,
-    Prices,
-    ImageInfo,
-} from '../product/productModel';
+import { BadgesToDisplay, QuantityOption, Prices, ImageInfo } from '../product/productModel';
 
 export interface ListItemsModel {
     items: ListItem[];
