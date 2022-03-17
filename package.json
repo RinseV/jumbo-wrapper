@@ -1,6 +1,6 @@
 {
     "name": "jumbo-wrapper",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "API Wrapper for Jumbo",
     "keywords": [
         "jumbo"
@@ -10,7 +10,7 @@
     "author": "RinseV",
     "license": "MIT",
     "scripts": {
-        "build": "tsc & rollup -c",
+        "build": "rollup --config rollup.config.ts --configPlugin typescript",
         "start": "ts-node src/jumbo.ts",
         "dev": "ts-node src/test.ts"
     },
