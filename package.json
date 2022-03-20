@@ -1,39 +1,43 @@
 {
-    "name": "jumbo-wrapper",
-    "version": "1.1.0",
-    "description": "API Wrapper for Jumbo",
-    "keywords": [
-        "jumbo"
-    ],
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "author": "RinseV",
-    "license": "MIT",
-    "scripts": {
-        "build": "rollup --config rollup.config.ts --configPlugin typescript",
-        "start": "ts-node src/jumbo.ts",
-        "dev": "ts-node src/test.ts"
-    },
-    "devDependencies": {
-        "@rollup/plugin-typescript": "^8.2.5",
-        "@types/node": "^14.14.25",
-        "@types/node-fetch": "^2.5.8",
-        "dotenv": "^8.2.0",
-        "rollup": "^2.56.3",
-        "ts-node": "^9.1.1",
-        "tsc": "^1.20150623.0",
-        "tslib": "^2.3.1",
-        "typescript": "^4.1.3"
-    },
-    "dependencies": {
-        "axios": "^0.21.1",
-        "date-fns": "^2.17.0"
-    },
-    "homepage": "https://github.com/RinseV/jumbo-wrapper",
-    "bugs": "https://github.com/RinseV/jumbo-wrapper/issues",
-    "repository": {
-        "url": "https://github.com/RinseV/jumbo-wrapper",
-        "type": "git"
-    },
-    "readme": ""
+  "name": "jumbo-wrapper",
+  "version": "1.1.0",
+  "description": "API Wrapper for Jumbo",
+  "keywords": [
+    "jumbo"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "RinseV",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin typescript",
+    "start": "ts-node src/jumbo.ts",
+    "dev": "ts-node src/test.ts",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^8.2.5",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^14.14.25",
+    "@types/node-fetch": "^2.5.8",
+    "dotenv": "^8.2.0",
+    "jest": "^27.5.1",
+    "rollup": "^2.56.3",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^9.1.1",
+    "tsc": "^1.20150623.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "date-fns": "^2.17.0"
+  },
+  "homepage": "https://github.com/RinseV/jumbo-wrapper",
+  "bugs": "https://github.com/RinseV/jumbo-wrapper/issues",
+  "repository": {
+    "url": "https://github.com/RinseV/jumbo-wrapper",
+    "type": "git"
+  },
+  "readme": ""
 }
