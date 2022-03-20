@@ -16,3 +16,6 @@ rollup.config.ts
 .env.example
 coverage
 test
+jest.config.ts
+.github
+*.tgz
