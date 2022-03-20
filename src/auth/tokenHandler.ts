@@ -4,7 +4,17 @@ export class TokenHandler {
     private jumboToken?: string;
     Ready: Promise<any>;
 
-    constructor(private readonly jumbo: Jumbo, private readonly username: string, private readonly password: string) {
+    constructor(
+        private readonly jumbo: Jumbo,
+        private readonly username: string,
+        private readonly password: string,
+        private readonly token?: string
+    ) {
+        if (token) {
+            this.jumboToken = token;
+            this.Ready = Promise.resolve();
+            return;
+        }
         this.Ready = new Promise((resolve, reject) => {
             this.generateToken()
                 .then(() => {
@@ -33,7 +43,7 @@ export class TokenHandler {
             username: this.username
         };
         // Send POST request with info
-        let response = await this.jumbo.post(`users/login`, JSON.stringify(body), undefined, undefined, false, true);
+        let response = await this.jumbo.post(`users/login`, JSON.stringify(body), undefined, false, true);
         // Save token
         return await response.headers['x-jumbo-token'];
     }

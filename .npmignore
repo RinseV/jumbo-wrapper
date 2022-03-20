@@ -14,3 +14,8 @@ rollup.config.ts
 .nvmrc
 .gitattributes
 .env.example
+coverage
+test
+jest.config.ts
+.github
+*.tgz
