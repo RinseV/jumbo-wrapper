@@ -9,10 +9,20 @@ import { Recipe } from './recipe/recipe';
 import { User } from './user/user';
 import { Category } from './category/category';
 import { List } from './list/list';
-const endpoint = 'https://mobileapi.jumbo.com/v17/';
+
+export interface JumboClientOptions {
+    username?: string;
+    password?: string;
+    token?: string;
+    verbose?: boolean;
+    axiosConfig?: AxiosRequestConfig;
+    apiVersion?: number;
+}
 
 export class Jumbo {
+    private endpoint = 'https://mobileapi.jumbo.com/';
     private readonly client: AxiosInstance;
+    private verbose: boolean;
 
     jumboCategory: Category;
     jumboList: List;
@@ -25,25 +35,24 @@ export class Jumbo {
     tokenHandler?: TokenHandler;
 
     /**
-     * @param username Jumbo username
-     * @param password Jumbo password
-     * @param verbose Whether requests should be logged in the console
-     * @param config Custom Axios config, must use 'TLSv1.2' as TLS version
+     * @param options Options for the client
+     * @param options.username Jumbo account username (e-mail)
+     * @param options.password Jumbo account password
+     * @param options.token Jumbo access token
+     * @param options.verbose Whether to log requests (default false)
+     * @param options.axiosConfig Axios configuration (defaults to TLSv1.2)
+     * @param options.apiVersion Jumbo API version (defaults to 17)
      */
-    constructor(
-        private readonly username?: string,
-        private readonly password?: string,
-        private readonly verbose?: boolean,
-        private readonly config?: AxiosRequestConfig
-    ) {
+    constructor(options?: JumboClientOptions) {
         // Create https agent for TLSv1.2 or less (API doesn't respond to TLSv1.3+)
-        this.client = config
-            ? axios.create(config)
+        this.client = options?.axiosConfig
+            ? axios.create(options.axiosConfig)
             : axios.create({
                   httpsAgent: new https.Agent({
                       maxVersion: 'TLSv1.2'
                   })
               });
+        this.endpoint = options?.apiVersion ? this.endpoint + `v${options.apiVersion}/` : this.endpoint + 'v17/';
         // Set separate classes
         this.jumboCategory = new Category(this, false);
         this.jumboList = new List(this, false);
@@ -54,9 +63,14 @@ export class Jumbo {
         this.jumboStore = new Store(this, false);
         this.jumboUser = new User(this, true);
         // Login using given username and password
-        if (username && password) {
-            this.login(username, password);
+        if (options?.username && options?.password) {
+            this.login(options.username, options.password);
         }
+        // Login using given token
+        if (options?.token) {
+            this.loginWithToken(options.token);
+        }
+        this.verbose = options?.verbose || false;
     }
 
     category() {
@@ -101,55 +115,63 @@ export class Jumbo {
     }
 
     /**
+     * Function that creates a new TokenHandler for given access token
+     * @param token Jumbo access token
+     */
+    loginWithToken(token: string) {
+        this.tokenHandler = new TokenHandler(this, '', '', token);
+    }
+
+    /**
      * PUT request
      * @param path Endpoint URL (without start)
      * @param body Body of PUT (if any)
-     * @param extraHeaders Any extra headers
-     * @param query Any query options
+     * @param additionalRequestOptions Any additional headers or queries
      * @param authRequired Whether a token is required for the function
      * @param fullResponse Returns response + headers instead of only data
      */
     async put(
         path: string,
         body?: any,
-        extraHeaders?: Headers,
-        query?: Query,
+        additionalRequestOptions?: AdditionalRequestOptions,
         authRequired?: boolean,
         fullResponse?: boolean
     ) {
-        return this.request(path, requestMethod.PUT, body, extraHeaders, query, authRequired, fullResponse);
+        return this.request(path, requestMethod.PUT, body, additionalRequestOptions, authRequired, fullResponse);
     }
 
     /**
      * POST request
      * @param path Endpoint URL (without start)
      * @param body Body of POST
-     * @param extraHeaders Any extra headers
-     * @param query Any query options
+     * @param additionalRequestOptions Any additional headers or queries
      * @param authRequired Whether a token is required for the function
      * @param fullResponse Returns response + headers instead of only data
      */
     async post(
         path: string,
         body: any,
-        extraHeaders?: Headers,
-        query?: Query,
+        additionalRequestOptions?: AdditionalRequestOptions,
         authRequired?: boolean,
         fullResponse?: boolean
     ) {
-        return this.request(path, requestMethod.POST, body, extraHeaders, query, authRequired, fullResponse);
+        return this.request(path, requestMethod.POST, body, additionalRequestOptions, authRequired, fullResponse);
     }
 
     /**
      * GET request
      * @param path Endpoint URL (without start)
-     * @param extraHeaders Any extra headers
-     * @param query Any query options
+     * @param additionalRequestOptions Any additional headers or queries
      * @param authRequired Whether a token is required for the function
      * @param fullResponse Returns response + headers instead of only data
      */
-    async get(path: string, extraHeaders?: Headers, query?: Query, authRequired?: boolean, fullResponse?: boolean) {
-        return this.request(path, requestMethod.GET, undefined, extraHeaders, query, authRequired, fullResponse);
+    async get(
+        path: string,
+        additionalRequestOptions?: AdditionalRequestOptions,
+        authRequired?: boolean,
+        fullResponse?: boolean
+    ) {
+        return this.request(path, requestMethod.GET, undefined, additionalRequestOptions, authRequired, fullResponse);
     }
 
     /**
@@ -157,8 +179,7 @@ export class Jumbo {
      * @param path Endpoint URL (without start)
      * @param method Request method (GET, POST, PUT, DELETE)
      * @param body Body in case of POST and PUT
-     * @param extraHeaders Any extra headers (Content-Type and Accept) are already included
-     * @param query Query in case of GET
+     * @param additionalRequestOptions Any additional headers or queries
      * @param authRequired Whether a token is required for the function
      * @param fullResponse Returns response + headers instead of only data
      */
@@ -166,15 +187,14 @@ export class Jumbo {
         path: string,
         method: requestMethod,
         body?: any,
-        extraHeaders?: Headers,
-        query?: Query,
+        additionalRequestOptions?: AdditionalRequestOptions,
         authRequired?: boolean,
         fullResponse?: boolean
     ) {
         // If auth is required and we don't have a token yet, we should create one
         if (authRequired) {
             if (!this.tokenHandler) {
-                throw new Error(`You must be logged in to access this path: ${endpoint + path}`);
+                throw new Error(`You must be logged in to access this path: ${this.endpoint + path}`);
             } else {
                 // If the tokenHandler doesn't have a token yet, make sure it gets one
                 await this.tokenHandler.Ready;
@@ -182,10 +202,10 @@ export class Jumbo {
         }
 
         // Create initial header properties
-        let requestHeaders: Headers = this.createHeader(authRequired, extraHeaders);
+        let requestHeaders: Headers = this.createHeader(authRequired, additionalRequestOptions?.headers);
 
         // Add query to URL if given
-        let url: string = this.createURL(path, query);
+        let url: string = this.createURL(path, additionalRequestOptions?.query);
 
         // Log if verbose
         if (this.verbose) {
@@ -248,9 +268,9 @@ export class Jumbo {
         // Add query if given
         if (query) {
             const params = new URLSearchParams(query);
-            url = endpoint + path + '?' + params;
+            url = this.endpoint + path + '?' + params;
         } else {
-            url = endpoint + path;
+            url = this.endpoint + path;
         }
 
         // Return URL
@@ -276,4 +296,12 @@ export interface Query {
 
 export interface Headers {
     [key: string]: string;
+}
+
+/**
+ * Interface that combines additional headers and query options
+ */
+export interface AdditionalRequestOptions {
+    headers?: Headers;
+    query?: Query;
 }

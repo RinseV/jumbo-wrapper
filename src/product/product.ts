@@ -1,47 +1,54 @@
-import { Headers, Query } from '../jumbo';
-import { JumboObject } from '../base/jumboObject';
+import { JumboObject, PaginationOptions } from '../base/jumboObject';
+import { AdditionalRequestOptions, Query } from '../jumbo';
 import { ProductModel } from './productModel';
 import { ProductQueryModel } from './productQueryModel';
+
+export interface ProductOptions extends PaginationOptions {
+    filters?: ProductFilter;
+    sort?: ProductSortOptions;
+}
 
 export class Product extends JumboObject {
     /**
      * Gets product from ID
      * @param productId Product ID
      */
-    async getProductFromId(productId: string, headers?: Headers, query?: Query): Promise<ProductModel> {
-        return await this.jumbo.get(`products/${productId}`, headers, query);
+    async getProductFromId(
+        productId: string,
+        additionalRequestOptions?: AdditionalRequestOptions
+    ): Promise<ProductModel> {
+        return await this.jumbo.get(`products/${productId}`, additionalRequestOptions);
     }
 
     /**
      * Get products from given product name
      * @param productName Product name to search for
-     * @param offset Offset in search (default 0)
-     * @param limit Amount of products returned (default 10)
-     * @param filter Filters (from ProductFilter)
-     * @param sort Sort options as defined in ./productModel
+     * @param options Options for the query
+     * @param options.offset Offset in search (default 0)
+     * @param options.limit Amount of products returned (default 10)
+     * @param options.filter Filters (from ProductFilter)
+     * @param options.sort Sort options (from ProductSortOptions)
      */
     async getProductsFromName(
         productName: string,
-        offset?: number,
-        limit?: number,
-        filter?: ProductFilter,
-        sort?: ProductSortOptions,
-        headers?: Headers,
-        query?: Query
+        options?: ProductOptions,
+        additionalRequestOptions?: AdditionalRequestOptions
     ): Promise<ProductModel[]> {
         const totalQuery: Query = {
             q: productName,
-            offset: (offset ? offset : 0).toString(),
-            limit: (limit ? limit : 10).toString(),
-            sort: (sort ? sort : '').toString()
+            offset: (options?.offset || 0).toString(),
+            limit: (options?.limit || 10).toString(),
+            sort: (options?.sort || '').toString()
         };
-        if (filter) {
-            totalQuery['filters'] = this.translateProductFilterToQuery(filter);
+        if (options?.filters) {
+            totalQuery['filters'] = this.translateProductFilterToQuery(options.filters);
         }
         // First get query results as productQueryModel
-        const products: ProductQueryModel = await this.jumbo.get(`search`, headers, {
-            ...totalQuery,
-            ...query
+        const products: ProductQueryModel = await this.jumbo.get(`search`, {
+            query: {
+                ...totalQuery
+            },
+            ...additionalRequestOptions
         });
         // Then create a ProductModel for every ProductQuery product
         const result: ProductModel[] = [];
@@ -55,21 +62,6 @@ export class Product extends JumboObject {
         }
         // Return array of ProductModels
         return result;
-    }
-
-    /**
-     * Shortcut function to get the first product when searching for name
-     * @param productName Product name to search for
-     * @param sort Sort options as defined in ./productModel
-     */
-    async getFirstProductFromName(
-        productName: string,
-        sort?: ProductSortOptions,
-        headers?: Headers,
-        query?: Query
-    ): Promise<ProductModel> {
-        const product = await this.getProductsFromName(productName, 0, 1, undefined, sort, headers, query);
-        return product[0];
     }
 
     /**

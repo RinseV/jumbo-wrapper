@@ -1,35 +1,38 @@
-import { Headers, Query } from '../jumbo';
+import { JumboObject, PaginationOptions } from '../base/jumboObject';
+import { AdditionalRequestOptions } from '../jumbo';
 import { RecipeModel } from './recipeModel';
-import { JumboObject } from '../base/jumboObject';
 import { RecipeQueryModel } from './recipeQueryModel';
+
+export interface RecipeOptions extends PaginationOptions {}
 
 export class Recipe extends JumboObject {
     /**
      * Get recipe from ID
      * @param recipeId Recipe ID
      */
-    async getRecipeFromId(recipeId: number, headers?: Headers, query?: Query): Promise<RecipeModel> {
-        return await this.jumbo.get(`recipes/${recipeId}`, headers, query);
+    async getRecipeFromId(recipeId: number, additionalRequestOptions?: AdditionalRequestOptions): Promise<RecipeModel> {
+        return await this.jumbo.get(`recipes/${recipeId}`, additionalRequestOptions);
     }
 
     /**
      * Get recipes from given recipe name
      * @param recipeName Recipe name to search for
-     * @param offset Offset in search (default 0)
-     * @param count Amount of recipes returned (default 10)
+     * @param options Options for the search
+     * @param options.offset Offset in search (default 0)
+     * @param options.limit Amount of products returned (default 10)
      */
     async getRecipesFromName(
         recipeName: string,
-        offset?: number,
-        count?: number,
-        headers?: Headers,
-        query?: Query
+        options?: RecipeOptions,
+        additionalRequestOptions?: AdditionalRequestOptions
     ): Promise<RecipeModel[]> {
-        const recipes: RecipeQueryModel = await this.jumbo.get(`recipes`, headers, {
-            q: recipeName,
-            offset: (offset ? offset : 0).toString(),
-            limit: (count ? count : 10).toString(),
-            ...query
+        const recipes: RecipeQueryModel = await this.jumbo.get(`recipes`, {
+            query: {
+                q: recipeName,
+                offset: (options?.offset || 0).toString(),
+                limit: (options?.limit || 10).toString()
+            },
+            ...additionalRequestOptions
         });
         const result: RecipeModel[] = [];
         for (var key in recipes.recipes.data) {
@@ -44,26 +47,24 @@ export class Recipe extends JumboObject {
     }
 
     /**
-     * Shortcut function to get the first recipe when searching for name
-     * @param recipeName Recipe name to search for
-     */
-    async getFirstRecipeFromName(recipeName: string, headers?: Headers, query?: Query): Promise<RecipeModel> {
-        const recipe = await this.getRecipesFromName(recipeName, 0, 1, headers, query);
-        return recipe[0];
-    }
-
-    /**
      * Get recipes from given filter ID
      * @param filterId Recipe filter ID
-     * @param offset Offset in search (default 0)
-     * @param count Amount of recipes returned (default 10)
+     * @param options Options for the search
+     * @param options.offset Offset in search (default 0)
+     * @param options.limit Amount of products returned (default 10)
      */
-    async getRecipesFromFilterId(filterId: number, offset?: number, count?: number, headers?: Headers, query?: Query) {
-        const recipes: RecipeQueryModel = await this.jumbo.get(`recipes`, headers, {
-            filterId: filterId.toString(),
-            offset: (offset ? offset : 0).toString(),
-            limit: (count ? count : 10).toString(),
-            ...query
+    async getRecipesFromFilterId(
+        filterId: number,
+        options?: RecipeOptions,
+        additionalRequestOptions?: AdditionalRequestOptions
+    ) {
+        const recipes: RecipeQueryModel = await this.jumbo.get(`recipes`, {
+            query: {
+                filterId: filterId.toString(),
+                offset: (options?.offset || 0).toString(),
+                limit: (options?.limit || 10).toString()
+            },
+            ...additionalRequestOptions
         });
         const result: RecipeModel[] = [];
         for (var key in recipes.recipes.data) {

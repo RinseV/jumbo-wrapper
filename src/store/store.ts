@@ -1,41 +1,45 @@
-import { Headers, Query } from '../jumbo';
-import { JumboObject } from '../base/jumboObject';
+import { JumboObject, PaginationOptions } from '../base/jumboObject';
+import { AdditionalRequestOptions } from '../jumbo';
 import { StoreModel } from './storeModel';
 import { StoreQueryModel } from './storeQueryModel';
+
+interface StoreOptions extends PaginationOptions {
+    long: number;
+    lat: number;
+    distance?: number;
+}
 
 export class Store extends JumboObject {
     /**
      * Gets store from store ID
      * @param storeId Store ID
      */
-    async getStoreFromId(storeId: number, headers?: Headers, query?: Query): Promise<StoreModel> {
-        return this.jumbo.get(`stores/${storeId}`, headers, query);
+    async getStoreFromId(storeId: number, additionalRequestOptions?: AdditionalRequestOptions): Promise<StoreModel> {
+        return this.jumbo.get(`stores/${storeId}`, additionalRequestOptions);
     }
 
     /**
      * Find stores based on given longitude, latitude and distance (optional)
-     * @param long Longitude
-     * @param lat Latitude
-     * @param distance Maximum search radius (default none)
-     * @param count Number of stores to retrieve (default 20)
-     * @param offset Offset in search (default 0)
+     * @param options Options for the search
+     * @param options.long Longitude
+     * @param options.lat Latitude
+     * @param options.distance (Optional) Maximum search radius (default none)
+     * @param options.limit Number of stores to retrieve (default 20)
+     * @param options.offset Offset in search (default 0)
      */
     async getStoresFromLongLat(
-        long: number,
-        lat: number,
-        distance?: number,
-        count?: number,
-        offset?: number,
-        headers?: Headers,
-        query?: Query
+        options: StoreOptions,
+        additionalRequestOptions?: AdditionalRequestOptions
     ): Promise<StoreModel[]> {
-        const stores: StoreQueryModel = await this.jumbo.get(`stores`, headers, {
-            longitude: long.toString(),
-            latitude: lat.toString(),
-            distance: (distance ? distance : '').toString(),
-            count: (count ? count : 20).toString(),
-            offset: (offset ? offset : 0).toString(),
-            ...query
+        const stores: StoreQueryModel = await this.jumbo.get(`stores`, {
+            query: {
+                longitude: options.long.toString(),
+                latitude: options.lat.toString(),
+                distance: (options.distance || '').toString(),
+                count: (options.limit || 20).toString(),
+                offset: (options.offset || 0).toString()
+            },
+            ...additionalRequestOptions
         });
         const result: StoreModel[] = [];
         for (var key in stores.stores.data) {
@@ -47,15 +51,5 @@ export class Store extends JumboObject {
             result.push(store);
         }
         return result;
-    }
-
-    /**
-     * Shortcut function to get the nearest store given longitude and latitude
-     * @param long Longitude
-     * @param lat Latitude
-     */
-    async getNearestStoreFromLongLat(long: number, lat: number, headers?: Headers, query?: Query): Promise<StoreModel> {
-        const stores = await this.getStoresFromLongLat(long, lat, undefined, undefined, undefined, headers, query);
-        return stores[0];
     }
 }

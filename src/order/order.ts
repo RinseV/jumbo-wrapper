@@ -1,20 +1,21 @@
-import { Query, Headers } from '../jumbo';
-import { JumboObject } from '../base/jumboObject';
+import { fromUnixTime } from 'date-fns';
+import { JumboObject, PaginationOptions } from '../base/jumboObject';
+import { AdditionalRequestOptions } from '../jumbo';
 import { Delivery, DeliveryDate, OrderModel, Shipping, ShippingDate } from './orderModel';
 import { OrderQueryModel, OrderResponse, SingleOrderQueryModel } from './orderQueryModel';
-import { fromUnixTime } from 'date-fns';
+
+interface OrderOptions extends PaginationOptions {}
 
 export class Order extends JumboObject {
     /**
      * Gets order from ID
      * @param orderId Order ID
      */
-    async getMyOrderById(orderId: number, headers?: Headers, query?: Query): Promise<OrderModel> {
+    async getMyOrderById(orderId: number, additionalRequestOptions?: AdditionalRequestOptions): Promise<OrderModel> {
         // Get order from endpoint
         const order: SingleOrderQueryModel = await this.jumbo.get(
             `users/me/orders/${orderId}`,
-            headers,
-            query,
+            additionalRequestOptions,
             this.authRequired
         );
         // Convert times to dates
@@ -23,18 +24,23 @@ export class Order extends JumboObject {
 
     /**
      * Returns all the users' orders
-     * @param offset Offset (default 0)
-     * @param count Amount of orders (default 10)
+     * @param options Options for search
+     * @param options.offset Offset in search (default 0)
+     * @param options.limit Amount of lists to retrieve (default 10)
      */
-    async getMyOrders(offset?: number, count?: number, headers?: Headers, query?: Query): Promise<OrderModel[]> {
+    async getMyOrders(
+        options?: OrderOptions,
+        additionalRequestOptions?: AdditionalRequestOptions
+    ): Promise<OrderModel[]> {
         // Query all orders as orderQueryModel
         const orders: OrderQueryModel = await this.jumbo.get(
             `users/me/orders`,
-            headers,
             {
-                offset: (offset ? offset : 0).toString(),
-                count: (count ? count : 10).toString(),
-                ...query
+                query: {
+                    offset: (options?.offset || 0).toString(),
+                    count: (options?.limit || 10).toString()
+                },
+                ...additionalRequestOptions
             },
             this.authRequired
         );
@@ -47,8 +53,8 @@ export class Order extends JumboObject {
     /**
      * Shortcut function to return latest (first) order
      */
-    async getMyLatestOrder(headers?: Headers, query?: Query): Promise<OrderModel> {
-        const orders = await this.getMyOrders(0, 1, headers, query);
+    async getMyLatestOrder(additionalRequestOptions?: AdditionalRequestOptions): Promise<OrderModel> {
+        const orders = await this.getMyOrders({ limit: 1 }, additionalRequestOptions);
         return orders[0];
     }
 
@@ -56,29 +62,25 @@ export class Order extends JumboObject {
      * Returns all of the user's orders with a certain status
      * @param status Status of the order (Processing, Open, Completed)
      */
-    async getMyOrdersByStatus(status: OrderStatus, headers?: Headers, query?: Query): Promise<OrderModel[]> {
-        const orders = await this.getMyOrders(undefined, undefined, headers, query);
+    async getMyOrdersByStatus(
+        status: OrderStatus,
+        additionalRequestOptions?: AdditionalRequestOptions
+    ): Promise<OrderModel[]> {
+        const orders = await this.getMyOrders(undefined, additionalRequestOptions);
         return orders.filter((order) => {
             return order.order.data.status === status;
         });
     }
 
     /**
-     * Shortcut function to retrieve the latest order that matches the status
-     * @param status Status of the order
-     */
-    async getMyLatestOrderByStatus(status: OrderStatus, headers?: Headers, query?: Query): Promise<OrderModel> {
-        const orders = await this.getMyOrdersByStatus(status, headers, query);
-        return orders[0];
-    }
-
-    /**
      * Gets the user's relevant orders (which includes shipping time)
      */
-    async getMyRelevantOrders(headers?: Headers, query?: Query): Promise<OrderModel[]> {
-        const orders = await this.getMyOrders(undefined, undefined, headers, {
-            relevant: 'true',
-            ...query
+    async getMyRelevantOrders(additionalRequestOptions?: AdditionalRequestOptions): Promise<OrderModel[]> {
+        const orders = await this.getMyOrders(undefined, {
+            query: {
+                relevant: 'true'
+            },
+            ...additionalRequestOptions
         });
         return orders;
     }
