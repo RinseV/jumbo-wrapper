@@ -37,7 +37,7 @@ import { Jumbo } from 'jumbo-wrapper';
 
 ```javascript
 // Creates Jumbo object using username and password, set verbose=true if you want to see all requests
-const jumbo = new Jumbo(username, password, verbose, config);
+const jumbo = new Jumbo({ username, password, verbose: true });
 // Gets product as response from ID
 const product = await jumbo.product().getProductFromId('67649PAK');
 ```
@@ -56,7 +56,9 @@ import { Jumbo } from 'jumbo-wrapper';
 
 async function findFirstFiveProducts(productName: string) {
     const jumbo = new Jumbo();
-    const products = await jumbo.product().getProductsFromName(productName, 0, 5);
+    const products = await jumbo.product().getProductsFromName(productName, {
+        limit: 5
+    });
     console.log(
         products.map((product) => {
             return product.product.data.title;
@@ -71,20 +73,23 @@ findFirstFiveProducts('melk');
   'Jumbo Verse Halfvolle Melk 2L',
   'Jumbo Verse Halfvolle Melk 1L',
   'Jumbo Verse Halfvolle Melk 1, 5L',
-  'Jumbo Houdbare Halfvolle Melk Voordeelverpakking 6 x 1',
-  'Jumbo Verse Volle Melk 1L'
+  'Jumbo Karnemelk & Halfvolle Melk',
+  'Jumbo Houdbare Halfvolle Melk Voordeelverpakking 6 x 1L'
 ]
 ```
 
 You can also add diet and allergen filters:
 ```javascript
-import { Jumbo, ProductDietFilter } from 'jumbo-wrapper';
+import { Jumbo, ProductDietFilter, ProductAllergenFilter } from 'jumbo-wrapper';
 
 async function findLactoseFreeMilk() {
     const jumbo = new Jumbo();
-    const products = await jumbo.product().getProductsFromName('melk', 0, 5, {
-        diet: [ProductDietFilter.LactoseIntolerant],
-        allergens: [ProductAllergenFilter.Lactose]
+    const products = await jumbo.product().getProductsFromName('melk', {
+        limit: 5,
+        filters: {
+            diet: [ProductDietFilter.LactoseIntolerant],
+            allergens: [ProductAllergenFilter.Lactose]
+        }
     });
     console.log(
         products.map((product) => {
@@ -116,10 +121,12 @@ import { Jumbo } from 'jumbo-wrapper';
 
 async function findJumboStore(longitude: number, latitude: number) {
     const jumbo = new Jumbo();
-    const res = await jumbo
-        .store()
-        .getNearestStoreFromLongLat(longitude, latitude);
-    console.log(res.store.data.name);
+    const res = await jumbo.store().getStoresFromLongLat({
+        long: longitude,
+        lat: latitude,
+        limit: 1
+    });
+    console.log(res[0].store.data.name);
 }
 
 findJumboStore(4.4993409, 51.9106489);
@@ -138,7 +145,9 @@ import { Jumbo } from 'jumbo-wrapper';
 
 async function getFirstThreeListsFromCategory(category: string) {
     const jumbo = new Jumbo();
-    const lists = await jumbo.list().getListsByName(category, 0, 3);
+    const lists = await jumbo.list().getListsByName(category, {
+        limit: 3
+    });
     const names = lists.items.map((list) => {
         return list.title;
     });
@@ -149,7 +158,7 @@ getFirstThreeListsFromCategory('Winter');
 ```
 
 ```sh
-[ 'Budget koken', 'Soepen', 'Koken met groente' ]
+[ 'Budget koken', 'Koken met groente', 'Soepen' ]
 ```
 
 Keep in mind that while you don't need to be logged in to view public lists, if you want to view your own list you must login first.
