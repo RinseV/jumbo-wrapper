@@ -9,6 +9,7 @@ import { Recipe } from './recipe/recipe';
 import { User } from './user/user';
 import { Category } from './category/category';
 import { List } from './list/list';
+import { Basket } from './basket/basket';
 
 export interface JumboClientOptions {
     username?: string;
@@ -24,6 +25,7 @@ export class Jumbo {
     private readonly client: AxiosInstance;
     private verbose: boolean;
 
+    jumboBasket: Basket;
     jumboCategory: Category;
     jumboList: List;
     jumboOrder: Order;
@@ -54,6 +56,7 @@ export class Jumbo {
               });
         this.endpoint = options?.apiVersion ? this.endpoint + `v${options.apiVersion}/` : this.endpoint + 'v17/';
         // Set separate classes
+        this.jumboBasket = new Basket(this, false);
         this.jumboCategory = new Category(this, false);
         this.jumboList = new List(this, false);
         this.jumboOrder = new Order(this, true);
@@ -71,6 +74,10 @@ export class Jumbo {
             this.loginWithToken(options.token);
         }
         this.verbose = options?.verbose || false;
+    }
+
+    basket() {
+        return this.jumboBasket;
     }
 
     category() {
