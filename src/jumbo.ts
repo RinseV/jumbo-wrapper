@@ -23,10 +23,10 @@ export interface JumboClientOptions {
 export class Jumbo {
     private endpoint = 'https://mobileapi.jumbo.com/';
     private readonly client: AxiosInstance;
-    private verbose: boolean; 
+    private verbose: boolean;
 
-    jumboCategory: Category;
     jumboBasket: Basket;
+    jumboCategory: Category;
     jumboList: List;
     jumboOrder: Order;
     jumboProduct: Product;
@@ -56,8 +56,8 @@ export class Jumbo {
               });
         this.endpoint = options?.apiVersion ? this.endpoint + `v${options.apiVersion}/` : this.endpoint + 'v17/';
         // Set separate classes
+        this.jumboBasket = new Basket(this, false);
         this.jumboCategory = new Category(this, false);
-        this.jumboBasket = new Basket(this, true);
         this.jumboList = new List(this, false);
         this.jumboOrder = new Order(this, true);
         this.jumboProduct = new Product(this, false);
@@ -76,12 +76,12 @@ export class Jumbo {
         this.verbose = options?.verbose || false;
     }
 
-    category() {
-        return this.jumboCategory;
-    }
-
     basket() {
         return this.jumboBasket;
+    }
+
+    category() {
+        return this.jumboCategory;
     }
 
     list() {

@@ -1,21 +1,22 @@
 import { JumboObject } from '../base/jumboObject';
 import { AdditionalRequestOptions } from '../jumbo';
-import { BasketModel } from './basketModel';
+import { BasketModel, PutBasketItems, PutBasketResponse } from './basketModel';
 
 export class Basket extends JumboObject {
     /**
-     * Gets basket 
+     * Gets basket
      */
-    getMyBasket(additionalRequestOptions?: AdditionalRequestOptions): Promise<BasketModel> {
-        return await this.jumbo.get(`basket/`, additionalRequestOptions, true);
+    async getMyBasket(additionalRequestOptions?: AdditionalRequestOptions): Promise<BasketModel> {
+        return await this.jumbo.get(`basket`, additionalRequestOptions);
     }
     /**
-     * @param productJson consists of sku quantity 
-     * @param additionalRequestOptions 
+     * Updates basket with items, overwriting existing items
+     * @param productJson Items with quantity, sku and unit
      */
-    addToBasket(productJson: any, additionalRequestOptions?: AdditionalRequestOptions): Promise<BasketModel> {
-        return await this.jumbo.put(`basket/`, productJson, additionalRequestOptions, true);
+    async updateBasket(
+        productJson: PutBasketItems,
+        additionalRequestOptions?: AdditionalRequestOptions
+    ): Promise<PutBasketResponse> {
+        return await this.jumbo.put(`basket`, productJson, additionalRequestOptions);
     }
 }
-
-export {};
