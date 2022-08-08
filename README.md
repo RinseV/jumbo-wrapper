@@ -182,3 +182,46 @@ getLatestOrder('example@mail.com', 'password');
 ```
 
 Keep in mind that you need to be logged in to get your orders, for instructions see [Authentication](https://github.com/RinseV/jumbo-wrapper/wiki/Authentication).
+
+#### Basket
+
+If I want to view my current basket:
+
+```javascript
+import { Jumbo } from 'jumbo-wrapper';
+
+async function getMyBasket(username: string, password: string) {
+    const jumbo = new Jumbo(username, password);
+    const basket = await jumbo.basket().getMyBasket();
+    console.log(basket.prices.total.amount);
+}
+
+getMyBasket('example@mail.com', 'password');
+```
+
+While this will work when not logged in, it does not really make sense to view the basket of a user that is not logged in.
+
+You can also update your basket as follows:
+
+```javascript
+import { Jumbo } from 'jumbo-wrapper';
+
+async function addMilkToMyBasket(username: string, password: string) {
+    const jumbo = new Jumbo(username, password);
+    const updatedBasket = await jumbo.basket().updateBasket({
+        items: [
+            {
+                quantity: 1,
+                sku: '67649PAK', // SKU for milk
+                unit: 'pieces' // 'pieces' is often the right choice
+            }
+        ],
+        vagueTerms: []
+    });
+    console.log(updatedBasket.items[0].sku);
+}
+
+addMilkToMyBasket('example@mail.com', 'password');
+```
+
+Again, while this will work when not logged in, it does not really make sense to update the basket of a user that is not logged in. Furthermore, the response given by ``updateBasket`` is different from ``getMyBasket`` since the response from ``updateBasket`` will not include any price information, as such, it is recommended to call ``getMyBasket`` after ``updateBasket`` to get the new price information.
